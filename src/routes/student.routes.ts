@@ -19,4 +19,4 @@ studentRouter.get('/', async (request, response) => {
   response.json(await getRepository(Student).find());
 });
 
-export default studentRouter;
+export default studentRouter; 
