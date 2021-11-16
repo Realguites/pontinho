@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getRepository, getCustomRepository } from 'typeorm';
+import { getRepository, getCustomRepository, getConnection } from 'typeorm';
 import Class from '../entity/Class';
 import ClassRepository from '../repositories/ClassRepository';
 import { validate } from "class-validator"
@@ -18,6 +18,7 @@ classRouter.post('/', async (request, response) => {
 
     if(errors.length == 0){
       const res = await repo.save(classroom)
+      await getConnection().queryResultCache?.remove(['listClassRoom'])
       return response.status(201).json(res)
     }
     return response.status(400).json(errors.map(v => v.constraints))
@@ -28,7 +29,7 @@ classRouter.post('/', async (request, response) => {
 });
 
 classRouter.get('/', async (request, response) => {
-  response.json(await getRepository(Class).find());
+  response.json(await getRepository(Class).find({ cache: { id: 'listClassRoom', milliseconds: 1000} }));;
 });
 
 classRouter.get('/:name', async (request, response) => {

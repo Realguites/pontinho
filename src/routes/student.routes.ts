@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getRepository } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import Student from '../entity/Student';
 import { validate } from "class-validator"
 
@@ -20,6 +20,7 @@ studentRouter.post('/', async (request, response) => {
     
     if(errors.length == 0){
       const res = await repo.save(student)
+      await getConnection().queryResultCache?.remove(['listStudent'])
       return response.status(201).json(res)
     }
     return response.status(400).json(errors.map(v => v.constraints))
@@ -32,7 +33,7 @@ studentRouter.post('/', async (request, response) => {
 });
 
 studentRouter.get('/', async (request, response) => {
-  response.json(await getRepository(Student).find());
+  response.json(await getRepository(Student).find({ cache: { id: 'ListStudent', milliseconds: 2000 } }));
 });
 
 export default studentRouter;
