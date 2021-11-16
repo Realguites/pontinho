@@ -9,13 +9,15 @@ import {
 } from 'typeorm';
 import Class from './Class';
 import Content from './Content';
+import { MaxLength } from "class-validator"
+import CommonData from './CommonData';
 
 @Entity('lesson')
-export default class Lesson {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export default class Lesson extends CommonData{
+  
 
   @Column()
+  @MaxLength(150, {message: "Descrição deve ter no maximo 100 caracteres"})
   description: string;
 
   @OneToOne(type => Content, lesson=> Lesson)
@@ -24,9 +26,5 @@ export default class Lesson {
   @ManyToOne(type => Class, lessons => Lesson, { eager: true})
   classe: Class;
 
-  @CreateDateColumn({ name: 'created_At' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_At' })
-  updatedAt: Date;
+  
 }
